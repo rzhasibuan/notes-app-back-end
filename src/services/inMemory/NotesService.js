@@ -35,4 +35,21 @@ class notesServices {
     }
     return note;
   }
+
+  editNoteById(id, { title, body, tags }) {
+    const index = this._notes.filter((node) => node.id === id)[0];
+    if (index === -1) {
+      throw new Error('Gagal memperbaharui catatan. Id tidak ditemukan');
+    }
+
+    const updatedAt = new Date().toISOString();
+
+    this._notes[index] = {
+      ...this._notes[index],
+      title,
+      tags,
+      body,
+      updatedAt,
+    };
+  }
 }
