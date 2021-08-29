@@ -52,4 +52,14 @@ class notesServices {
       updatedAt,
     };
   }
+
+  deleteNoteById(id) {
+    const index = this._notes.filter((node) => node.id === id)[0];
+    if (index === -1) {
+      throw new Error('Gagal menghapus catatan');
+    }
+    this._notes.splice(index, 1);
+  }
 }
+
+module.exports = notesServices;
