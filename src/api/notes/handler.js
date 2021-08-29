@@ -1,67 +1,100 @@
 /* eslint-disable no-underscore-dangle */
-const { nanoid } = require('nanoid');
-
 class NotesServices {
-  constructor() {
-    this._notes = [];
+  constructor(services) {
+    this._services = services;
   }
 
-  addNote({ title, body, tags }) {
-    const id = nanoid(16);
-    const createdAt = new Date().toISOString();
-    const updatedAt = createdAt;
+  postNoteHandler(request, h) {
+    try {
+      const { title = 'untitled', body, tags } = request.payload;
 
-    const newNote = {
-      title, tags, body, id, createdAt, updatedAt,
-    };
+      const noteId = this._services.addNote({ title, body, tags });
 
-    this._notes.push(newNote);
+      const response = h.response({
+        status: 'success',
+        message: 'Note success created',
+        data: {
+          noteId,
+        },
+      });
 
-    const isSuccess = this._notes.filter((note) => note.id === id).length > 0;
-    if (!isSuccess) {
-      throw new Error('Catatan gagal di tambahkan');
+      response.code(201);
+      return response;
+    } catch (error) {
+      const response = h.response({
+        status: 'fail',
+        message: error.message,
+      });
+      response.code(400);
+      return response;
     }
-    return id;
   }
 
-  getNotes() {
-    return this._notes;
-  }
-
-  getNoteById(id) {
-    const note = this._notes.filter((n) => n.id === id)[0];
-
-    if (!note) {
-      throw new Error('catatan tidak ditemukan');
-    }
-    return note;
-  }
-
-  editNoteById(id, { title, body, tags }) {
-    const index = this._notes.filter((note) => note.id === id)[id];
-
-    if (index === -1) {
-      throw new Error('Gagal memperbaharui, Id tidak ditemukan');
-    }
-
-    const updatedAt = new Date().toISOString();
-    this._notes[index] = {
-      ...this._notes[index],
-      title,
-      tags,
-      body,
-      updatedAt,
+  getNotesHandler() {
+    const notes = this._services.getNotes();
+    return {
+      status: 'success',
+      data: {
+        notes,
+      },
     };
   }
 
-  deleteNoteById(id) {
-    const index = this._notes.filter((note) => note.id === id)[0];
-
-    if (index === -1) {
-      throw new Error('gagal menghapus catatan, Id tidak ditemukan');
+  getNoteByIdHandler(request, h) {
+    try {
+      const { id } = request.params;
+      const note = this._services.getNotById(id);
+      return {
+        status: 'success',
+        data: {
+          note,
+        },
+      };
+    } catch (error) {
+      const response = h.response({
+        status: 'fail',
+        message: error.message,
+      });
+      response.code(404);
+      return response;
     }
+  }
 
-    this._notes.splice(index, 1);
+  putNoteByIdHandler(request, h) {
+    try {
+      const { id } = request.params;
+
+      this._services.editNoteById(id, request.payload);
+      return {
+        status: 'success',
+        message: 'notes has been updated',
+      };
+    } catch (error) {
+      const response = h.response({
+        status: 'success',
+        message: error.message,
+      });
+      response.code(404);
+      return response;
+    }
+  }
+
+  deleteNoteByIdHandler(request, h) {
+    try {
+      const { id } = request.params;
+      this._services.deleteNoteById(id);
+      return {
+        status: 'success',
+        message: 'notes has been deleted',
+      };
+    } catch (error) {
+      const response = h.response({
+        status: 'fail',
+        message: 'Notes can not deleted, Id not found!',
+      });
+      response.code(404);
+      return response;
+    }
   }
 }
 
