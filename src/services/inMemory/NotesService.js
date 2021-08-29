@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 const { nanoid } = require('nanoid');
 
-class notesServices {
+class NotesServices {
   constructor() {
     this._notes = [];
   }
@@ -62,4 +62,4 @@ class notesServices {
   }
 }
 
-module.exports = notesServices;
+module.exports = NotesServices;
