@@ -37,9 +37,9 @@ class NotesServices {
   }
 
   editNoteById(id, { title, body, tags }) {
-    const index = this._notes.filter((node) => node.id === id)[0];
+    const index = this._notes.findIndex((note) => note.id === id);
     if (index === -1) {
-      throw new Error('Gagal memperbaharui catatan. Id tidak ditemukan');
+      throw new Error('Gagal memperbarui catatan. Id tidak ditemukan');
     }
 
     const updatedAt = new Date().toISOString();
@@ -54,9 +54,9 @@ class NotesServices {
   }
 
   deleteNoteById(id) {
-    const index = this._notes.filter((node) => node.id === id)[0];
+    const index = this._notes.findIndex((note) => note.id === id);
     if (index === -1) {
-      throw new Error('Gagal menghapus catatan');
+      throw new Error('catatan tidak ditemukan');
     }
     this._notes.splice(index, 1);
   }
