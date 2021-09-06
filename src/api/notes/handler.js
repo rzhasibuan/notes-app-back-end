@@ -14,9 +14,13 @@ class NotesHandler {
 
   postNoteHandler(request, h) {
     try {
+      // validasi
       this._validator.validateNotePayload(request.payload);
+
+      // Destructuring variable
       const { title = 'untitled', body, tags } = request.payload;
 
+      //  accept from noteServices
       const noteId = this._service.addNote({ title, body, tags });
 
       const response = h.response({
