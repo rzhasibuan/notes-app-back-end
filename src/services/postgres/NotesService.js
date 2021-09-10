@@ -16,7 +16,7 @@ class NotesService {
     const updatedAt = createdAt;
 
     const query = {
-      text: 'INSERT INTO notes VALUES($1, $2, $3, $4, $5, $6) returning id',
+      text: 'INSERT INTO notes VALUES($1, $2, $3, $4, $5, $6) RETURNING id',
       values: [id, title, body, tags, createdAt, updatedAt],
     };
 
@@ -34,7 +34,7 @@ class NotesService {
     return result.rows.map(mapDBToModel);
   }
 
-  async getNotesById(id) {
+  async getNoteById(id) {
     const query = {
       text: 'SELECT * FROM notes WHERE id = $1',
       values: [id],
@@ -45,5 +45,14 @@ class NotesService {
       throw new NotFoundError('Catatan tidak ditemukan');
     }
     return result.rows.maps(mapDBToModel)[0];
+  }
+
+  async editNoteById(id, {title, body, tags} ) {
+    const updatedAt = new Date().toDateString();
+    const query = {
+      text: 'UPDATE notes SET title = $1, body = $2, tags = $3, update_at = $4 WHERE id = $5 RETURNING id',
+      values: [title, body, tags, updatedAt, id],
+    };
+    const result = await this._pool.query(query);
   }
 }
