@@ -47,12 +47,29 @@ class NotesService {
     return result.rows.maps(mapDBToModel)[0];
   }
 
-  async editNoteById(id, {title, body, tags} ) {
+  async editNoteById(id, { title, body, tags }) {
     const updatedAt = new Date().toDateString();
     const query = {
       text: 'UPDATE notes SET title = $1, body = $2, tags = $3, update_at = $4 WHERE id = $5 RETURNING id',
       values: [title, body, tags, updatedAt, id],
     };
     const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Gagal memperbarui catatan. Id tidak ditemukan');
+    }
+  }
+
+  async deleteNoteById(id) {
+    const query = {
+      text: 'DELETE FROM notes WHERE id = $1 RETURNING id',
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Catatan gagal dihapus. Id tidak ditemukan');
+    }
   }
 }
