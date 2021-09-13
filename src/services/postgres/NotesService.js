@@ -20,7 +20,7 @@ class NotesService {
       values: [id, title, body, tags, createdAt, updatedAt],
     };
 
-    const result = this._pool.query(query);
+    const result = await this._pool.query(query);
 
     if (!result.rows[0].id) {
       throw new InvariantError('Catatan gagal ditambahkan');
@@ -44,13 +44,13 @@ class NotesService {
     if (!result.rows.length) {
       throw new NotFoundError('Catatan tidak ditemukan');
     }
-    return result.rows.maps(mapDBToModel)[0];
+    return result.rows.map(mapDBToModel)[0];
   }
 
   async editNoteById(id, { title, body, tags }) {
     const updatedAt = new Date().toDateString();
     const query = {
-      text: 'UPDATE notes SET title = $1, body = $2, tags = $3, update_at = $4 WHERE id = $5 RETURNING id',
+      text: 'UPDATE notes SET title = $1, body = $2, tags = $3, updated_at = $4 WHERE id = $5 RETURNING id',
       values: [title, body, tags, updatedAt, id],
     };
     const result = await this._pool.query(query);
